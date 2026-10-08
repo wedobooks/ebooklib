@@ -1727,7 +1727,7 @@ class EpubReader(object):
             self.zf = Directory()
         else:
             try:
-                self.zf = zipfile.ZipFile(self.file_name, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True)
+                self.zf = zipfile.ZipFile(self.file_name, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True, metadata_encoding='utf-8')
             except zipfile.BadZipfile as bz:
                 raise EpubException(0, 'Bad Zip file')
             except zipfile.LargeZipFile as bz:
