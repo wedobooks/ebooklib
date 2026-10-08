@@ -1386,6 +1386,15 @@ class EpubWriter(object):
         self.out.close()
 
 
+def _open_zip(file_name):
+    # EPUB file names are UTF-8, flagged or not. A zip whose names are not valid UTF-8
+    # is not a valid EPUB, but is still read, with zipfile's default encoding (CP437).
+    try:
+        return zipfile.ZipFile(file_name, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True, metadata_encoding='utf-8')
+    except UnicodeDecodeError:
+        return zipfile.ZipFile(file_name, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True)
+
+
 class EpubReader(object):
     DEFAULT_OPTIONS = {
         'ignore_ncx': False
@@ -1727,7 +1736,7 @@ class EpubReader(object):
             self.zf = Directory()
         else:
             try:
-                self.zf = zipfile.ZipFile(self.file_name, 'r', compression=zipfile.ZIP_DEFLATED, allowZip64=True, metadata_encoding='utf-8')
+                self.zf = _open_zip(self.file_name)
             except zipfile.BadZipfile as bz:
                 raise EpubException(0, 'Bad Zip file')
             except zipfile.LargeZipFile as bz:
